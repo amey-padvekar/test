@@ -1,0 +1,40 @@
+**1. Question: What is MapReduce in Hadoop?**
+
+   Answer: MapReduce is a programming model and processing engine designed for parallel processing of large data sets in a distributed computing environment like Hadoop. It consists of two main phases - the Map phase for processing and transforming data, and the Reduce phase for aggregating and summarizing the results.
+
+**2. Question: How does the MapReduce process work in Hadoop?**
+
+   Answer: In the Map phase, input data is divided into smaller chunks and processed in parallel by multiple mapper tasks. Each mapper task produces key-value pairs as intermediate outputs. In the Reduce phase, these intermediate key-value pairs are shuffled, sorted, and then processed by multiple reducer tasks to generate the final output.
+
+**3. Question: What are the key components of MapReduce in Hadoop?**
+
+   Answer: The key components include:
+
+   - **Mapper:** Processes input data and generates intermediate key-value pairs.
+   - **Reducer:** Aggregates and summarizes the intermediate key-value pairs to produce the final output.
+   - **Shuffle and Sort:** The process of transferring intermediate data from mappers to reducers and sorting it based on keys.
+   - **InputFormat:** Defines how input data is split and processed by mapper tasks.
+   - **OutputFormat:** Specifies the format of the final output produced by reducer tasks.
+
+**4. Question: How is data distributed among the mappers in MapReduce?**
+
+   Answer: Hadoop's HDFS (Hadoop Distributed File System) divides input data into blocks, and each block is processed by a separate mapper. The Hadoop framework automatically handles the distribution of these blocks to different nodes in the cluster.
+
+**5. Question: Explain the role of the combiner in MapReduce.**
+
+   Answer: The combiner is an optional optimization in MapReduce. It is a mini-reducer that operates locally on the output of each mapper. It helps reduce the amount of data shuffled between mappers and reducers by combining and aggregating the intermediate key-value pairs before they are sent to the reducers.
+
+**6. Question: How does fault tolerance work in MapReduce?**
+
+   Answer: Hadoop provides fault tolerance by replicating data across multiple nodes in the cluster. If a node fails during processing, the Hadoop framework automatically reruns the affected tasks on other available nodes using the replicated data.
+
+**7. Question: Can a MapReduce job have multiple mappers and reducers?**
+
+   Answer: Yes, a MapReduce job can have multiple mappers and reducers. The number of mappers is typically determined by the input data splits, while the number of reducers can be configured by the user.
+
+**8. Question: What are some common use cases for MapReduce in Hadoop?**
+
+   Answer: MapReduce is commonly used for tasks involving large-scale data processing, such as log analysis, data cleaning, and aggregation of large datasets. It is particularly effective for processing data in parallel across a distributed cluster of machines.
+
+
+-----------------------------------------------

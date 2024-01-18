@@ -1,0 +1,418 @@
+To perform the mentioned HDFS commands, you would typically use the Hadoop command-line interface (CLI). Here are the commands for each task:
+
+i. Display the present working directory:
+```bash
+hadoop fs -pwd
+```
+
+ii. Display the list of files in Hadoop file system:
+```bash
+hadoop fs -ls
+```
+
+iii. Create a new directory in Hadoop file system:
+```bash
+hadoop fs -mkdir /path/to/new_directory
+```
+
+Replace `/path/to/new_directory` with the actual path where you want to create the new directory.
+
+iv. Copy a file from the local system to Hadoop:
+```bash
+hadoop fs -copyFromLocal /path/to/local/file /path/in/hadoop
+```
+
+Replace `/path/to/local/file` with the local file's path, and `/path/in/hadoop` with the destination path in Hadoop.
+
+v. Display the content of a file in the Hadoop file system:
+```bash
+hadoop fs -cat /path/to/hadoop/file
+```
+
+Replace `/path/to/hadoop/file` with the actual path of the file in Hadoop.
+
+vi. Move the file to the trash folder:
+```bash
+hadoop fs -mv /path/to/hadoop/file /user/<username>/.Trash/Current/
+```
+
+Replace `/path/to/hadoop/file` with the actual path of the file in Hadoop, and `<username>` with your Hadoop username.
+
+Note: The location of the trash folder may vary based on your Hadoop distribution. The above command assumes the default location for Apache Hadoop. If you are using a different distribution, you may need to adjust the path accordingly.
+---------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+Running Spark in Scala mode typically involves writing Spark code in Scala and executing it using the `spark-shell` or `spark-submit` commands. Below are step-by-step instructions to run Spark in Scala mode using the `spark-shell`:
+
+### Prerequisites:
+
+1. **Install Spark:**
+   - Download and install Apache Spark on your machine. You can get it from the [official Apache Spark website](https://spark.apache.org/downloads.html).
+   - Follow the installation instructions provided in the Spark documentation.
+
+2. **Set Up Environment:**
+   - Ensure that Java is installed and the `JAVA_HOME` environment variable is set.
+   - Set the `SPARK_HOME` environment variable to the directory where Spark is installed.
+
+### Running Spark in Scala Mode:
+
+#### Step 1: Open Terminal
+
+Open a terminal or command prompt on your machine.
+
+#### Step 2: Start `spark-shell`
+
+Run the following command to start the Spark interactive shell (`spark-shell`):
+
+```bash
+$SPARK_HOME/bin/spark-shell
+```
+
+Replace `$SPARK_HOME` with the actual path to your Spark installation directory.
+
+#### Step 3: Write Spark Scala Code
+
+Once the `spark-shell` is launched, you will see the Scala prompt (`scala>`). Now you can write and execute Spark Scala code directly in the shell.
+
+For example, you can create a simple DataFrame:
+
+```scala
+val data = Seq(("Alice", 25), ("Bob", 30), ("Charlie", 22))
+val df = spark.createDataFrame(data).toDF("Name", "Age")
+df.show()
+```
+
+#### Step 4: Execute Scala Code
+
+Press Enter to execute the Scala code. You will see the output of the DataFrame.
+
+#### Step 5: Exit `spark-shell`
+
+To exit the `spark-shell`, type `:q` and press Enter.
+
+### Running Spark Application Using `spark-submit`:
+
+If you have a Spark application written in Scala and saved in a file (e.g., `MySparkApp.scala`), you can use `spark-submit` to submit and execute the application:
+
+#### Step 1: Write Scala Application
+
+Write your Spark Scala application in a file (e.g., `MySparkApp.scala`).
+
+```scala
+import org.apache.spark.sql.SparkSession
+
+object MySparkApp {
+  def main(args: Array[String]): Unit = {
+    val spark = SparkSession.builder.appName("MySparkApp").getOrCreate()
+    
+    // Your Spark application code here
+    
+    spark.stop()
+  }
+}
+```
+
+#### Step 2: Compile Scala Application
+
+Compile the Scala application using `scalac`:
+
+```bash
+scalac -classpath $SPARK_HOME/jars/* MySparkApp.scala
+```
+
+#### Step 3: Run Spark Application
+
+Run the Spark application using `spark-submit`:
+
+```bash
+$SPARK_HOME/bin/spark-submit --class MySparkApp --master local[*] MySparkApp.class
+```
+
+Replace `$SPARK_HOME` with the actual path to your Spark installation directory.
+
+These steps should help you run Spark in Scala mode interactively using `spark-shell` or by submitting a Spark Scala application using `spark-submit`. Adjust the paths and configurations based on your specific environment.
+
+----------------------------------------------------------------------
+
+HIVE TUTORIAL
+
+To execute a Hive program in Cloudera, you can use the Hive shell to interactively run Hive queries or create a script with your Hive queries and execute it using the Hive CLI. Below are the step-by-step instructions for the operations you mentioned:
+
+### Step 1: Launch Hive Shell
+
+Open a terminal and launch the Hive shell by entering the following command:
+
+```bash
+hive
+```
+
+### Step 2: Create Database and Tables
+
+```sql
+-- Create database
+CREATE DATABASE IF NOT EXISTS MCA_rollno;
+
+-- Use the database
+USE MCA_rollno;
+
+-- Create employee table
+CREATE TABLE employee (
+  emp_id INT,
+  empfname STRING,
+  emplname STRING,
+  job STRING,
+  sal DOUBLE,
+  deptcode INT
+);
+
+-- Create department table
+CREATE TABLE department (
+  deptcode INT,
+  deptname STRING,
+  location STRING
+);
+```
+
+### Step 3: Create Data Files
+
+Create two data files, `employee.txt` and `dept.txt`, and populate them with sample data. For example:
+
+**employee.txt:**
+```
+1,John,Doe,Analyst,50000,30
+2,Jane,Smith,Manager,70000,20
+3,Bob,Johnson,Clerk,30000,10
+```
+
+**dept.txt:**
+```
+10,HR,New York
+20,IT,San Francisco
+30,Finance,Chicago
+```
+
+### Step 4: Load Data into Tables
+
+```sql
+-- Load data into employee table
+LOAD DATA LOCAL INPATH '/path/to/employee.txt' INTO TABLE employee;
+
+-- Load data into department table
+LOAD DATA LOCAL INPATH '/path/to/dept.txt' INTO TABLE department;
+```
+
+Replace `/path/to/employee.txt` and `/path/to/dept.txt` with the actual paths to your data files.
+
+### Step 5: List Records
+
+```sql
+-- List all records from the employee table
+SELECT * FROM employee;
+
+-- List all records from the department table
+SELECT * FROM department;
+```
+
+### Step 6: Display Full Name and Salary for Analysts in Department 30
+
+```sql
+-- Display full name and salary for analysts in deptno 30
+SELECT empfname || ' ' || emplname AS full_name, sal
+FROM employee
+WHERE job = 'Analyst' AND deptcode = 30;
+```
+
+### Step 7: Display Minimum Salary
+
+```sql
+-- Display minimum salary
+SELECT MIN(sal) AS min_salary
+FROM employee;
+```
+
+### Step 8: Display Name of Each Employee in UPPERCASE
+
+```sql
+-- Display name of each employee in UPPERCASE
+SELECT UPPER(empfname) AS upper_fname, UPPER(emplname) AS upper_lname
+FROM employee;
+```
+
+### Step 9: Display Sum of Employee Salaries Job Wise
+
+```sql
+-- Display sum of employee salaries job wise
+SELECT job, SUM(sal) AS total_salary
+FROM employee
+GROUP BY job;
+```
+
+### Step 10: Perform LEFT OUTER JOIN
+
+```sql
+-- Perform LEFT OUTER JOIN between employee and department using key deptcode
+SELECT e.*, d.deptname, d.location
+FROM employee e
+LEFT OUTER JOIN department d ON e.deptcode = d.deptcode;
+```
+
+### Step 11: Exit Hive Shell
+
+Exit the Hive shell when you are done:
+
+```sql
+EXIT;
+```
+
+Remember to replace the paths and filenames with your actual file locations and names. Additionally, adjust the SQL queries based on your specific requirements.
+-----------------------------------------------------------------
+To execute an Apache Pig program in Cloudera, you can follow these steps. Apache Pig uses a scripting language called Pig Latin. Below are the steps for the operations you mentioned:
+
+### Step 1: Create a Pig Script
+
+Create a Pig script file (e.g., `employee_processing.pig`) and write the following Pig Latin script:
+
+```pig
+-- Step 1: Load data from employee_data.txt
+employee_data = LOAD '/path/to/employee_data.txt' 
+                USING PigStorage(',')
+                AS (empcode:INT, empfname:CHARARRAY, emplname:CHARARRAY, job:CHARARRAY, manager:CHARARRAY, hiredate:CHARARRAY, salary:INT, commission:INT);
+
+-- Step 2: Display all data of employee in ascending order
+sorted_employee = ORDER employee_data BY empcode ASC;
+
+-- Step 3: Display full name of the employee and first three characters of job detail
+result = FOREACH sorted_employee GENERATE empfname, emplname, CONCAT(empfname, ' ', emplname) AS full_name, SUBSTRING(job, 0, 3) AS job_first_three_chars;
+
+-- Step 4: Display the result
+DUMP result;
+```
+
+Replace `/path/to/employee_data.txt` with the actual path to your data file.
+
+### Step 2: Execute the Pig Script
+
+Open a terminal and run the following command to execute the Pig script:
+
+```bash
+pig -f employee_processing.pig
+```
+
+### Step 3: Verify the Results
+
+Review the output in the terminal. The script will display the full name of the employee and the first three characters of the job details in ascending order.
+
+Make sure to adjust the script based on the actual structure of your data and the location of the input file.
+
+Remember that these instructions might vary depending on your Cloudera distribution version and cluster setup. Ensure that Pig is installed and configured properly in your Cloudera environment.
+
+-----------------------------------------------------
+Certainly! Below are the MongoDB shell commands to perform the specified operations:
+
+### Step 1: Start MongoDB
+
+Ensure MongoDB is installed on your system. Open a terminal and run the following command to start the MongoDB server:
+
+```bash
+mongod
+```
+
+### Step 2: Connect to MongoDB and Create Database
+
+Open another terminal and run the following command to connect to MongoDB using the MongoDB shell:
+
+```bash
+mongo
+```
+
+Now, you're in the MongoDB shell. Continue with the following commands:
+
+### Step 3: Create Database MCA2022
+
+```javascript
+use MCA2022
+```
+
+### Step 4: Create Collections
+
+```javascript
+db.createCollection("Employee")
+db.createCollection("Customer")
+```
+
+### Step 5: Insert Documents
+
+```javascript
+// Single document insertion for Employee
+db.Employee.insertOne({
+  emp_id: 1,
+  emp_fname_emp_lname: "John Doe",
+  dept: "IT",
+  sal: 60000
+})
+
+// Multiple document insertion for Employee
+db.Employee.insertMany([
+  { emp_id: 2, emp_fname_emp_lname: "Jane Smith", dept: "HR", sal: 70000 },
+  { emp_id: 3, emp_fname_emp_lname: "Bob Johnson", dept: "Finance", sal: 80000 }
+])
+
+// Single document insertion for Customer
+db.Customer.insertOne({
+  cust_id: 101,
+  cust_fname: "Alice",
+  cust_lname: "Wonder",
+  contact_no: "1234567890",
+  address: "123 Main St"
+})
+```
+
+### Step 6: Find Employee According to ID
+
+```javascript
+db.Employee.find({ emp_id: 1 })
+```
+
+### Step 7: Find Customer According to cust_id
+
+```javascript
+db.Customer.find({ cust_id: 101 })
+```
+
+### Step 8: Update Employee Salary
+
+```javascript
+db.Employee.updateOne({ emp_id: 1 }, { $set: { sal: 65000 } })
+```
+
+### Step 9: Delete Document
+
+```javascript
+db.Employee.deleteOne({ emp_id: 2 })
+```
+
+### Step 10: Create Index on Employee
+
+```javascript
+db.Employee.createIndex({ sal: -1 })
+```
+
+### Step 11: Get List of Indexes
+
+```javascript
+db.Employee.getIndexes()
+```
+
+### Step 12: Drop the Index
+
+```javascript
+db.Employee.dropIndex("sal_-1")
+```
+
+### Step 13: Sort Data According to Employee Salary
+
+```javascript
+db.Employee.find().sort({ sal: -1 })
+```
+
+These steps assume that you have MongoDB installed and running. Adjust the data and field names as needed. Also, be cautious with operations like dropping indexes and deleting documents.
+----------------------------------------------------------------

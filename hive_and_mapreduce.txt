@@ -1,0 +1,635 @@
+A MapReduce program executes in several phases, each with its own specific tasks and responsibilities. Here are the main phases of a MapReduce program:MapReduce is a programming model and processing paradigm designed for parallel and distributed computing to handle large-scale data processing. It simplifies the processing of vast datasets by breaking down tasks into two main phases: the Map phase and the Reduce phase.
+ 
+MapReduce is highly scalable and fault-tolerant, making it suitable for processing large datasets across distributed clusters of computers. It was popularized by Google and is commonly used in frameworks like Apache Hadoop for big data processing tasks. The simplicity and scalability of MapReduce enable efficient processing of data-intensive applications.
+1. **Input Phase:**
+   - The input phase involves reading input data from one or more data sources, typically distributed storage systems like Hadoop Distributed File System (HDFS).
+   - Input data is divided into fixed-size blocks, and each block is assigned to a Mapper for processing.
+
+2. **Map Phase:**
+   - In the map phase, the input data is processed by a set of Mappers. Each Mapper independently processes its assigned data block and produces a set of intermediate key-value pairs.
+   - The key-value pairs emitted by the Mapper are based on the logic defined in the user-implemented `map` function.
+
+3. **Shuffle and Sort Phase:**
+   - The shuffle and sort phase is responsible for transferring the output of the Mappers to the Reducers. This involves sorting and grouping the intermediate key-value pairs by key across all Mappers.
+   - The goal is to ensure that all values for a given key are sent to the same Reducer, allowing the Reducer to aggregate and process related data together.
+
+4. **Combine (Optional):**
+   - The Combine phase is an optional optimization step that occurs after the Map phase and before the Shuffle and Sort phase. It can be used to perform a local aggregation of data within each Mapper before the data is sent to the Reducers.
+   - The Combine function is similar to the Reducer but is applied locally within each Mapper. It helps in reducing the amount of data transferred during the shuffle phase.
+
+5. **Reduce Phase:**
+   - In the reduce phase, the intermediate key-value pairs, grouped by key, are processed by a set of Reducers. Each Reducer receives all values associated with a specific key from different Mappers.
+   - The user-implemented `reduce` function defines how the Reducer processes and combines the values for a given key to produce the final output.
+
+6. **Output Phase:**
+   - The final phase involves writing the output of the Reducers to the desired output location, which is typically a distributed file system like HDFS.
+**Driver Code:**
+   - A driver program configures and runs the entire MapReduce job, specifying the input data, output location, and the Mapper and Reducer classes.
+
+These phases together form the MapReduce programming model, designed to efficiently process large-scale data in parallel across a distributed cluster of computers. The framework automatically handles the distribution of data, execution of tasks, and fault tolerance. The user needs to implement the map and reduce functions based on the specific processing logic required for their application.
+--------------------------------------------
+A MapReduce program consists of two main phases: the Map phase and the Reduce phase. Each phase is defined by a set of functions that the user implements: the Mapper and Reducer. I'll explain each phase along with an example using a classic Word Count problem.
+
+### Map Phase:
+
+1. **Mapper Setup:**
+   - Initialization setup before the map function is called.
+
+```java
+public static class WordCountMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+    // Setup method (not always used)
+    protected void setup(Context context) throws IOException, InterruptedException {
+        // Initialization code goes here
+    }
+
+    // Map method
+    public void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+        // Implementation of mapping logic
+    }
+}
+```
+
+2. **Map Function:**
+   - The `map` function processes each input record and emits intermediate key-value pairs.
+
+```java
+public void map(LongWritable key, Text value, Context context)
+        throws IOException, InterruptedException {
+    String line = value.toString();
+    StringTokenizer tokenizer = new StringTokenizer(line);
+
+    while (tokenizer.hasMoreTokens()) {
+        word.set(tokenizer.nextToken());
+        context.write(word, one);
+    }
+}
+```
+
+### Shuffle and Sort:
+
+After the Map phase, the MapReduce framework groups and sorts the intermediate key-value pairs by key. This is a behind-the-scenes process and is managed by the framework.
+
+### Reduce Phase:
+
+3. **Reducer Setup:**
+   - Initialization setup before the reduce function is called.
+
+```java
+public static class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    // Setup method (not always used)
+    protected void setup(Context context) throws IOException, InterruptedException {
+        // Initialization code goes here
+    }
+
+    // Reduce method
+    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+            throws IOException, InterruptedException {
+        // Implementation of reducing logic
+    }
+}
+```
+
+4. **Reduce Function:**
+   - The `reduce` function processes each group of intermediate key-value pairs and produces the final output.
+
+```java
+public void reduce(Text key, Iterable<IntWritable> values, Context context)
+        throws IOException, InterruptedException {
+    int sum = 0;
+
+    for (IntWritable value : values) {
+        sum += value.get();
+    }
+
+    context.write(key, new IntWritable(sum));
+}
+```
+
+### Driver Code:
+
+5. **Driver Code:**
+   - Configures and runs the MapReduce job.
+
+```java
+public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf, "SimpleWordCount");
+
+    job.setJarByClass(SimpleWordCount.class);
+    job.setMapperClass(WordCountMapper.class);
+    job.setCombinerClass(WordCountReducer.class);
+    job.setReducerClass(WordCountReducer.class);
+
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+}
+```
+
+In this example, the Map phase tokenizes each input line and emits intermediate key-value pairs, where the key is a word and the value is 1. The Shuffle and Sort phase then groups and sorts these pairs by the word. Finally, the Reduce phase sums up the counts for each word and produces the final output.
+
+-------------------------------------------------------------------------------------
+**Q: What is NoSQL?**
+
+**A: NoSQL stands for "Not Only SQL." It is a type of database management system that diverges from the traditional relational database model. 
+	Unlike relational databases, NoSQL databases are designed to handle and store vast amounts of unstructured or semi-structured data. 
+	NoSQL databases are often used in scenarios where scalability, flexibility, and high-performance access to large datasets are crucial.
+	Types: Key-value store, Document store, column family store, graph store
+	Popular examples include MongoDB, Cassandra, Redis, and Neo4j.**
+
+**Q: What is MongoDB?**
+
+**A: MongoDB is a widely-used NoSQL database management system that falls under the category of document-oriented databases. 
+	It is designed to handle large amounts of unstructured or semi-structured data.
+	MongoDB stores data in flexible, JSON-like documents called BSON (Binary JSON), allowing for dynamic and schema-less data structures. 
+	It supports automatic sharding for horizontal scaling, providing high scalability and performance. MongoDB is known for its ease of use, rich querying capabilities, and the ability to handle complex data structures.
+
+Queries in Mongodb
+
+1. **Insert Documents:**
+   - **Query:** `db.collection.insertOne({ key: value })` or `db.collection.insertMany([{...}, {...}])`
+   - **Explanation:** Adds one or multiple documents to the specified collection.
+
+2. **Find Documents:**
+   - **Query:** `db.collection.find({ key: value })`
+   - **Explanation:** Retrieves documents from the collection based on the specified query criteria.
+
+3. **Update Documents:**
+   - **Query:** `db.collection.updateOne({ filter }, { $set: { key: value } })` or `db.collection.updateMany({ filter }, { $set: { key: value } })`
+   - **Explanation:** Modifies one or multiple documents in the collection based on the specified filter criteria.
+
+4. **Delete Documents:**
+   - **Query:** `db.collection.deleteOne({ filter })` or `db.collection.deleteMany({ filter })`
+   - **Explanation:** Removes one or multiple documents from the collection based on the specified filter criteria.
+
+5. **Count Documents:**
+   - **Query:** `db.collection.countDocuments({ filter })`
+   - **Explanation:** Returns the count of documents that match the specified filter criteria.
+
+6. **Sort Documents:**
+   - **Query:** `db.collection.find().sort({ key: 1 })` (ascending) or `db.collection.find().sort({ key: -1 })` (descending)
+   - **Explanation:** Sorts the documents in the collection based on the specified key.
+
+7. **Limit Results:**
+   - **Query:** `db.collection.find().limit(5)`
+   - **Explanation:** Restricts the number of documents returned by the query.
+
+8. **Indexing:**
+   - **Query:** `db.collection.createIndex({ key: 1 })`
+   - **Explanation:** Creates an index on the specified key, improving query performance.
+
+9. **Aggregation:**
+   - **Query:** `db.collection.aggregate([{ $group: { _id: "$key", count: { $sum: 1 } } }])`
+   - **Explanation:** Performs aggregation operations on the data, such as grouping and calculating sums.
+
+10. **Projection:**
+    - **Query:** `db.collection.find({ filter }, { key: 1, _id: 0 })`
+    - **Explanation:** Limits the fields returned in the query results.
+------------------------------------------------------------------------
+Indexing
+
+In MongoDB, indexing is a process of creating an index on a field or set of fields in a collection. An index is a data structure that improves the speed of data retrieval operations on a database. By creating an index on one or more fields, MongoDB can efficiently locate and retrieve documents that match the specified query conditions.
+
+Key points about indexing in MongoDB:
+
+1. **Purpose:**
+   - The primary purpose of indexing is to enhance the performance of read operations, such as queries and sorting.
+
+2. **How Indexing Works:**
+   - MongoDB uses B-tree data structures for indexing. These data structures allow for quick and efficient search operations.
+
+3. **Index Types:**
+   - MongoDB supports various types of indexes, including single-field indexes, compound indexes (indexes on multiple fields), multi-key indexes (indexes on arrays), geospatial indexes, and text indexes.
+
+4. **Creating Index:**
+   - Indexes can be created using the `createIndex()` method. For example:
+     ```javascript
+     db.collection.createIndex({ fieldName: 1 });
+     ```
+     This command creates a single-field ascending index on the specified field (`fieldName`).
+
+5. **Default Index:**
+   - MongoDB automatically creates an index on the `_id` field by default, ensuring fast retrieval of documents by their unique identifier.
+
+6. **Impact on Write Operations:**
+   - While indexing significantly improves read performance, it can slightly impact the speed of write operations (insert, update, and delete). This is because indexes need to be updated whenever the underlying data changes.
+
+7. **Query Optimization:**
+   - Indexes are crucial for optimizing query performance. They allow MongoDB to quickly locate and return the documents that match the query conditions.
+
+8. **Explain Method:**
+   - The `explain()` method can be used to analyze query performance, providing details on how MongoDB executes a query and whether it utilizes an index.
+
+Example of creating a compound index:
+```javascript
+db.collection.createIndex({ field1: 1, field2: -1 });
+```
+This command creates a compound index on `field1` in ascending order and `field2` in descending order.
+
+--------------------------------------------------
+HIVE
+
+**Q: What is Apache Hive?**
+
+**A: Apache Hive is a data warehousing and SQL-like query language system built on top of Apache Hadoop. It provides a high-level interface for managing and querying large datasets in a distributed storage system, such as Hadoop Distributed File System (HDFS). Hive allows users to write queries using a SQL-like language called HiveQL, which is similar to SQL, and translates these queries into MapReduce jobs for execution on the Hadoop cluster. Hive is particularly useful for analysts and data scientists who are familiar with SQL and want to analyze large-scale data stored in Hadoop without the need for extensive programming. It supports schema-on-read, enabling flexibility in handling structured and semi-structured data formats.**
+
+In Hive, data types are used to define the type of values that can be stored in columns. Hive provides a set of primitive and complex data types. Here are some of the commonly used Hive data types:
+
+1. **Primitive Data Types:**
+
+   - **TINYINT:**
+     - Range: -128 to 127 (1 byte)
+     - Example: `t1 TINYINT`
+
+   - **SMALLINT:**
+     - Range: -32,768 to 32,767 (2 bytes)
+     - Example: `s1 SMALLINT`
+
+   - **INT:**
+     - Range: -2^31 to 2^31-1 (4 bytes)
+     - Example: `i1 INT`
+
+   - **BIGINT:**
+     - Range: -2^63 to 2^63-1 (8 bytes)
+     - Example: `b1 BIGINT`
+
+   - **FLOAT:**
+     - Single-precision floating-point format (4 bytes)
+     - Example: `f1 FLOAT`
+
+   - **DOUBLE:**
+     - Double-precision floating-point format (8 bytes)
+     - Example: `d1 DOUBLE`
+
+   - **BOOLEAN:**
+     - Represents true or false values
+     - Example: `bool BOOLEAN`
+
+   - **STRING:**
+     - Variable-length character string
+     - Example: `str STRING`
+
+   - **CHAR:**
+     - Fixed-length character string
+     - Example: `char1 CHAR(10)`
+
+   - **VARCHAR:**
+     - Variable-length character string with a specified maximum length
+     - Example: `varchar1 VARCHAR(20)`
+
+   - **DATE:**
+     - Represents a date in the format 'YYYY-MM-DD'
+     - Example: `dt DATE`
+
+   - **TIMESTAMP:**
+     - Represents a timestamp with date and time
+     - Example: `ts TIMESTAMP`
+
+2. **Complex Data Types:**
+
+   - **ARRAY:**
+     - Ordered collection of elements
+     - Example: `arr ARRAY<INT>`
+
+   - **MAP:**
+     - Collection of key-value pairs
+     - Example: `mp MAP<STRING, INT>`
+
+   - **STRUCT:**
+     - Represents a structure with named fields
+     - Example: `st STRUCT<name: STRING, age: INT>`
+
+   - **UNION:**
+     - Represents a set of possible types for a column
+     - Example: `col UNIONTYPE<INT, DOUBLE, STRING>`
+
+-----------------------------------------
+In Hive, you can create a table using the `CREATE TABLE` statement. Below are the basic Hive commands to create a table:
+
+1. **Create a Table with Primitive Data Types:**
+   ```sql
+   CREATE TABLE my_table (
+       id INT,
+       name STRING,
+       age INT
+   );
+   ```
+
+2. **Create a Table with Complex Data Types (Array, Map, Struct):**
+   ```sql
+   CREATE TABLE complex_table (
+       id INT,
+       names ARRAY<STRING>,
+       attributes MAP<STRING, INT>,
+       info STRUCT<height: INT, weight: INT>
+   );
+   ```
+
+3. **Create a Table with Partitioning:**
+   ```sql
+   CREATE TABLE partitioned_table (
+       id INT,
+       name STRING
+   )
+   PARTITIONED BY (country STRING, year INT);
+   ```
+
+4. **Create a Table with External Storage:**
+   ```sql
+   CREATE EXTERNAL TABLE external_table (
+       id INT,
+       name STRING
+   )
+   LOCATION '/path/to/external/data';
+   ```
+
+7. **Create a Table with a Custom Location:**
+   ```sql
+   CREATE TABLE custom_location_table (
+       id INT,
+       name STRING
+   )
+   LOCATION '/custom/location';
+   ```
+--------------------------------------------------------
+**Hive Partitioning:**
+
+**Definition:**
+Hive partitioning is a mechanism that allows you to divide a large dataset into smaller, more manageable parts based on one or more columns. This division improves query performance and simplifies data organization. Partitions act as subdirectories, and each partition corresponds to a distinct set of values for the specified partitioning columns.
+
+**Commands:**
+
+1. **Create a Partitioned Table:**
+   ```sql
+   CREATE TABLE partitioned_table (
+       id INT,
+       name STRING
+   )
+   PARTITIONED BY (country STRING, year INT);
+   ```
+
+2. **Insert Data into Partitions:**
+   ```sql
+   INSERT INTO partitioned_table PARTITION (country='USA', year=2022) VALUES (1, 'John');
+   ```
+
+3. **Add a Partition:**
+   ```sql
+   ALTER TABLE partitioned_table ADD PARTITION (country='Canada', year=2022);
+   ```
+
+4. **Drop a Partition:**
+   ```sql
+   ALTER TABLE partitioned_table DROP PARTITION (country='USA', year=2022);
+   ```
+
+5. **Show Partitions:**
+   ```sql
+   SHOW PARTITIONS partitioned_table;
+   ```
+
+6. **Use Dynamic Partition Insert:**
+   ```sql
+   INSERT INTO TABLE partitioned_table PARTITION (country, year) SELECT id, name, 'India', 2022 FROM source_table;
+   ```
+
+7. **Use Static Partition Insert:**
+   ```sql
+   INSERT INTO TABLE partitioned_table PARTITION (country='UK', year=2022) SELECT id, name FROM source_table WHERE country='UK';
+   ```
+
+Partitioning is beneficial for optimizing query performance, especially when queries involve conditions on the partitioning columns. It helps in reducing the amount of data that needs to be scanned during query execution. The partitioning commands in Hive allow you to manage and organize data efficiently within the partitions.
+
+-----------------------------------------------------------------------------------------
+Hive provides various built-in operations and functions to perform data manipulation, analysis, and transformation within the Hive environment. Here are some commonly used built-in operations in Hive:
+
+1. **SELECT:**
+   - Used to retrieve data from one or more tables.
+   ```sql
+   SELECT column1, column2 FROM my_table WHERE condition;
+   ```
+
+2. **INSERT:**
+   - Adds data into a table.
+   ```sql
+   INSERT INTO target_table SELECT * FROM source_table;
+   ```
+
+3. **UPDATE:**
+   - Modifies existing records in a table.
+   ```sql
+   UPDATE my_table SET column1 = value WHERE condition;
+   ```
+
+4. **DELETE:**
+   - Removes records from a table.
+   ```sql
+   DELETE FROM my_table WHERE condition;
+   ```
+
+5. **JOIN:**
+   - Combines rows from two or more tables based on a related column between them.
+   ```sql
+   SELECT * FROM table1 JOIN table2 ON table1.column = table2.column;
+   ```
+
+6. **GROUP BY:**
+   - Groups rows based on one or more columns, often used with aggregate functions.
+   ```sql
+   SELECT column, COUNT(*) FROM my_table GROUP BY column;
+   ```
+
+7. **ORDER BY:**
+   - Sorts the result set based on one or more columns.
+   ```sql
+   SELECT * FROM my_table ORDER BY column ASC;
+   ```
+
+8. **LIMIT:**
+   - Restricts the number of rows returned by a query.
+   ```sql
+   SELECT * FROM my_table LIMIT 10;
+   ```
+
+9. **UNION:**
+   - Combines the result sets of two or more SELECT statements.
+   ```sql
+   SELECT column FROM table1 UNION SELECT column FROM table2;
+   ```
+
+10. **CASE:**
+    - Performs conditional logic within a query.
+    ```sql
+    SELECT column, CASE WHEN condition THEN result1 ELSE result2 END FROM my_table;
+    ```
+
+11. **CAST:**
+    - Converts data from one type to another.
+    ```sql
+    SELECT CAST(column AS INT) FROM my_table;
+    ```
+
+12. **SUBSTRING:**
+    - Extracts a substring from a string column.
+    ```sql
+    SELECT SUBSTRING(column, start, length) FROM my_table;
+    ```
+
+These built-in operations, along with a wide range of functions (e.g., mathematical, string, date), enable users to perform diverse data manipulations and analyses directly within Hive. They are integral to writing efficient and expressive HiveQL queries for big data processing.
+-------------------------------------------------------------
+Hive provides a variety of built-in functions that you can use in HiveQL queries to perform operations on data. Here are some commonly used categories of built-in functions in Hive:
+
+### 1. **Mathematical Functions:**
+   - `ABS`, `CEIL`, `FLOOR`, `ROUND`: Perform rounding and mathematical operations.
+   - `EXP`, `LOG`, `LOG10`: Exponential and logarithmic functions.
+   - `POWER`, `SQRT`: Raise to a power and square root.
+
+### 2. **String Functions:**
+   - `CONCAT`, `||`: Concatenate strings.
+   - `UPPER`, `LOWER`: Convert to uppercase or lowercase.
+   - `LENGTH`, `TRIM`: Get string length and remove leading/trailing spaces.
+   - `SUBSTRING`, `LEFT`, `RIGHT`: Extract substrings.
+   - `INSTR`, `LOCATE`: Find the position of a substring.
+
+### 3. **Date and Time Functions:**
+   - `CURRENT_DATE`, `CURRENT_TIMESTAMP`: Get the current date and timestamp.
+   - `YEAR`, `MONTH`, `DAY`, `HOUR`, `MINUTE`, `SECOND`: Extract components from a date or timestamp.
+   - `DATEDIFF`, `TIMEDIFF`: Calculate the difference between two dates or times.
+   - `FROM_UNIXTIME`, `UNIX_TIMESTAMP`: Convert between Unix timestamp and date/time.
+
+### 4. **Aggregate Functions:**
+   - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`: Aggregate functions for summarizing data.
+   - `GROUP_CONCAT`: Concatenate values within a group.
+   - `COLLECT_SET`, `COLLECT_LIST`: Collect unique or all values within a group.
+
+### 5. **Conditional Functions:**
+   - `CASE`, `WHEN`, `ELSE`, `END`: Conditional expressions.
+   - `COALESCE`, `NULLIF`: Handle NULL values.
+
+### 6. **Type Conversion Functions:**
+   - `CAST`: Convert data types.
+   - `TO_DATE`, `TO_UNIX_TIMESTAMP`: Convert between string and date/timestamp.
+
+### 7. **Mathematical and Aggregate Functions for Arrays:**
+   - `ARRAY`, `MAP`, `LIST`: Create and manipulate arrays and maps.
+   - `SIZE`, `EXPLODE`, `POSEXPLODE`: Get the size of an array, explode arrays into rows.
+
+### 8. **Windowing and Ranking Functions:**
+   - `ROW_NUMBER`, `RANK`, `DENSE_RANK`: Assign a unique number to each row within a partition.
+   - `LAG`, `LEAD`: Access data from preceding or following rows.
+
+### 9. **Cryptographic Functions:**
+   - `MD5`, `SHA1`, `SHA2`: Compute hash functions.
+
+### 10. **Miscellaneous Functions:**
+   - `IF`, `NVL`: Handle NULL values and perform conditional logic.
+   - `RAND`, `RAND()` : Generate random numbers.
+
+These functions empower users to manipulate and analyze data efficiently in Hive, making it a versatile tool for big data processing. The exact set of functions available can vary based on the Hive version and configuration. Users can refer to the official Hive documentation for a comprehensive list and detailed descriptions of these functions.
+------------------------------------------
+### Hive Views:
+
+**1. Definition:**
+   - A Hive view is a virtual table that is based on the result of a SELECT query. It does not store the data itself but provides a way to present the result of a query as if it were a table.
+
+**2. Creating a View:**
+   - Syntax: `CREATE VIEW view_name AS SELECT ...`
+   - Example:
+     ```sql
+     CREATE VIEW employee_view AS
+     SELECT emp_id, emp_name FROM employee WHERE emp_department = 'IT';
+     ```
+
+**3. Querying a View:**
+   - Once created, a view can be queried like a regular table.
+   ```sql
+   SELECT * FROM employee_view;
+   ```
+
+**4. Updating a View:**
+   - Views can be updated or replaced by dropping and recreating them.
+   ```sql
+   DROP VIEW employee_view;
+   CREATE VIEW employee_view AS SELECT emp_id, emp_name FROM employee WHERE emp_department = 'Finance';
+   ```
+
+**5. Advantages:**
+   - Simplifies complex queries by encapsulating logic.
+   - Provides a layer of abstraction, allowing changes to the underlying tables without affecting the query logic.
+
+### Hive Indexes:
+
+**1. Definition:**
+   - Hive supports indexes to improve query performance by providing a faster lookup of rows based on indexed columns.
+
+**2. Creating an Index:**
+   - Syntax: `CREATE INDEX index_name ON TABLE table_name (column_name) AS 'index_type';`
+   - Example:
+     ```sql
+     CREATE INDEX emp_dept_index ON TABLE employee (emp_department) AS 'COMPACT';
+     ```
+
+**3. Using an Index:**
+   - Hive can automatically use an index during query execution if it benefits the query performance.
+   - The decision to use an index is based on the query's conditions and the presence of an appropriate index.
+
+**4. Dropping an Index:**
+   - Syntax: `DROP INDEX index_name ON TABLE table_name;`
+   - Example:
+     ```sql
+     DROP INDEX emp_dept_index ON TABLE employee;
+     ```
+
+**5. Index Types:**
+   - Hive supports various index types, including 'COMPACT,' 'BITMAP,' and 'BUCKETED.'
+
+**6. Limitations:**
+   - Hive indexes are available only on certain column types and storage formats.
+   - Index maintenance is the responsibility of the user; automatic updates are not supported.
+
+**7. Use Cases:**
+   - Indexes can significantly speed up query performance when searching for specific values or ranges.
+
+-----------------------------------------------------------
+Certainly! Below are examples of HiveQL queries for the `SELECT` statement with various clauses:
+
+### 1. **SELECT with WHERE Clause:**
+```sql
+-- Select records from the 'employee' table where the department is 'IT'
+SELECT * FROM employee WHERE department = 'IT';
+```
+
+### 2. **SELECT with ORDER BY Clause:**
+```sql
+-- Select records from the 'sales' table and order them by the 'sales_amount' in descending order
+SELECT * FROM sales ORDER BY sales_amount DESC;
+```
+
+### 3. **SELECT with GROUP BY Clause:**
+```sql
+-- Calculate the total sales amount for each department from the 'sales' table
+SELECT department, SUM(sales_amount) AS total_sales FROM sales GROUP BY department;
+```
+
+### 4. **SELECT with Joins:**
+```sql
+-- Select information about employees and their corresponding department names from two tables using INNER JOIN
+SELECT e.*, d.department_name
+FROM employee e
+JOIN department d ON e.department_id = d.department_id;
+```
+
+In these examples:
+
+- The `WHERE` clause filters rows based on a specified condition.
+- The `ORDER BY` clause sorts the result set based on one or more columns.
+- The `GROUP BY` clause groups rows based on one or more columns and can be used with aggregate functions like `SUM`, `COUNT`, etc.
+- The `JOIN` clause combines rows from two or more tables based on a related column.
+
+These clauses allow users to retrieve and manipulate data in various ways, providing flexibility in querying and analyzing data stored in Hive tables.
+--------------------------------------------------------------------------
